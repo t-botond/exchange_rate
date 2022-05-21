@@ -123,6 +123,26 @@ class _CurrencyPage extends State<CurrencyPage> {
               }
             },
           ),
+          const Divider(
+            color: Colors.black,
+            height: 20.0,
+          ),
+          const Card(
+              child: ListTile(
+                title:Text("List Item 1") ,
+              )
+          ),
+          /*
+          ListView(
+            children: const [
+              Card(
+                  child: ListTile(
+                    title:Text("List Item 1") ,
+                  )
+              ),
+            ],
+            scrollDirection: Axis.vertical,
+          ),*/
         ])
       ),
     );
