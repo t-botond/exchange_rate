@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'http_service.dart';
 
 class CurrencyPage extends StatefulWidget {
@@ -7,11 +8,28 @@ class CurrencyPage extends StatefulWidget {
   _CurrencyPage createState() => _CurrencyPage();
 }
 
+
+
 class _CurrencyPage extends State<CurrencyPage> {
+  static const CURRENCY_FROM ="CurrencyFrom";
+  static const CURRENCY_TO ="CurrencyTo";
+
   final HttpService httpService = HttpService();
   final items = ['EUR','USD','HUF','BTC','GBP','PLN','CZK','SEK','NOK','DKK','CHF','ZAR','AUD','JPY','NZD','TRY','BRL','CAD','CNY','HKD','INR','ILS','MYR','MXN','SGD','RON','IDR','PHP','ARS','THB','NGN','PKR','AED','UAH','BGN','HRK','RSD','LTC','ETH','BCH','XRP','CLP','XNO','TRX','DAI','DOGE','USDT','BTCV','KRW','EGP','SAR','QAR','ADA','BUSD'];
   String selectedFromCurrency = 'EUR';
   String selectedToCurrency = 'HUF';
+
+  Future<String>getStoredCurrency(String key)async{
+    final prefs = await SharedPreferences.getInstance();
+    String res = prefs.getString(key)?? 'EUR';
+    return res;
+  }
+  void setStoredCurrency(String key,String value)async{
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,20 +48,31 @@ class _CurrencyPage extends State<CurrencyPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              DropdownButton(
-                value: selectedFromCurrency,
-                icon: const Icon(Icons.keyboard_arrow_down),
-                items: items.map((String item) {
-                  return DropdownMenuItem(
-                    value: item,
-                    child: Text(item),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedFromCurrency = newValue!;
-                  });
-                },
+              FutureBuilder(
+                  future: getStoredCurrency(CURRENCY_FROM),
+                  builder:( BuildContext context, value){
+                    if(value.hasData){
+                      selectedFromCurrency = value.data.toString();
+                      return DropdownButton(
+                        value: selectedFromCurrency,
+                        icon: const Icon(Icons.keyboard_arrow_down),
+                        items: items.map((String item) {
+                          return DropdownMenuItem(
+                            value: item,
+                            child: Text(item),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedFromCurrency = newValue!;
+                            setStoredCurrency(CURRENCY_FROM, selectedFromCurrency);
+                          });
+                        },
+                      );
+                    }else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  }
               ),
               const Icon(
                 Icons.arrow_right_alt,
@@ -51,20 +80,31 @@ class _CurrencyPage extends State<CurrencyPage> {
                 size: 30.0,
               ),
 
-              DropdownButton(
-                value: selectedToCurrency,
-                icon: const Icon(Icons.keyboard_arrow_down),
-                items: items.map((String item) {
-                  return DropdownMenuItem(
-                    value: item,
-                    child: Text(item),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedToCurrency = newValue!;
-                  });
-                },
+              FutureBuilder(
+                future: getStoredCurrency(CURRENCY_TO),
+                builder:( BuildContext context, value){
+                  if(value.hasData){
+                    selectedToCurrency = value.data.toString();
+                    return DropdownButton(
+                      value: selectedToCurrency,
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                      items: items.map((String item) {
+                        return DropdownMenuItem(
+                          value: item,
+                          child: Text(item),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedToCurrency = newValue!;
+                          setStoredCurrency(CURRENCY_TO, selectedToCurrency);
+                        });
+                      },
+                    );
+                  }else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                }
               ),
             ],
           ),
