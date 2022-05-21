@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'http_service.dart';
@@ -106,6 +108,14 @@ class _CurrencyPage extends State<CurrencyPage> {
                   }
                 }
               ),
+              Container(
+                margin: const EdgeInsets.only(left: 10.0),
+                child: const Icon(
+                    Icons.star_outline,
+                    color:Colors.black45
+                ),
+              ),
+
             ],
           ),
           FutureBuilder(
@@ -127,10 +137,89 @@ class _CurrencyPage extends State<CurrencyPage> {
             color: Colors.black,
             height: 20.0,
           ),
-          const Card(
-              child: ListTile(
-                title:Text("List Item 1") ,
-              )
+          Expanded(
+            child:ListView(
+              children: <Widget>[
+
+                Card(
+                    child:ListTile(
+                      title:Row(
+                        children: [
+                          const Text("1 EUR"),
+                          const Icon(
+                            Icons.arrow_right_alt,
+                            color: Colors.black,
+                            size: 30.0,
+                          ),
+                          FutureBuilder(
+                            future: httpService.getCurrency("EUR", "HUF"),
+                            builder: (BuildContext context,value) {
+                              if (value.hasData) {
+                                String currency = value.data.toString();
+                                return
+
+                                  Text(currency,style: TextStyle(fontWeight: FontWeight.bold));
+                              } else {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                            },
+                          ),
+
+                          const Text(" HUF"),
+
+                          const Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Icon(Icons.arrow_forward_ios, color: Colors.blueGrey,),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                ),
+
+                Card(
+                    child:ListTile(
+                      title:Row(
+                        children: [
+                          const Text("1 EUR"),
+                          const Icon(
+                            Icons.arrow_right_alt,
+                            color: Colors.black,
+                            size: 30.0,
+                          ),
+                          FutureBuilder(
+                            future: httpService.getCurrency("EUR", "HUF"),
+                            builder: (BuildContext context,value) {
+                              if (value.hasData) {
+                                String currency = value.data.toString();
+                                return
+
+                                  Text(currency,style: TextStyle(fontWeight: FontWeight.bold));
+                              } else {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                            },
+                          ),
+
+                          const Text(" HUF"),
+
+                          const Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Icon(Icons.arrow_forward_ios, color: Colors.blueGrey,),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                ),
+
+
+              ],
+            ),
           ),
           /*
           ListView(
