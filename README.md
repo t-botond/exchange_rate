@@ -2,10 +2,10 @@
 
 Valuták követésére, és gyors számítások elvégzésére készült.
 
-##Run
+## Run
 Edit configuration -> Additional run args: `--no-sound-null-safety`
 
-##Screenshots
+## Screenshots 
 ![](doc/CurrencyPage.png)
 
 
