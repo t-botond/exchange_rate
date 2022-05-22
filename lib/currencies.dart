@@ -3,12 +3,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'http_service.dart';
+import 'package:exchange_rate/Widgets/ListItem.dart';
+import 'data/Favorite.dart';
 
 class CurrencyPage extends StatefulWidget {
   const CurrencyPage({Key? key}) : super(key: key);
   @override
   _CurrencyPage createState() => _CurrencyPage();
 }
+
 
 
 
@@ -20,6 +23,11 @@ class _CurrencyPage extends State<CurrencyPage> {
   final items = ['EUR','USD','HUF','BTC','GBP','PLN','CZK','SEK','NOK','DKK','CHF','ZAR','AUD','JPY','NZD','TRY','BRL','CAD','CNY','HKD','INR','ILS','MYR','MXN','SGD','RON','IDR','PHP','ARS','THB','NGN','PKR','AED','UAH','BGN','HRK','RSD','LTC','ETH','BCH','XRP','CLP','XNO','TRX','DAI','DOGE','USDT','BTCV','KRW','EGP','SAR','QAR','ADA','BUSD'];
   String selectedFromCurrency = 'EUR';
   String selectedToCurrency = 'HUF';
+
+  List<Favorite> favorites = [Favorite("USD", "BTC"), Favorite("EUR", "HUF")];
+
+  bool isStarred=false;
+
 
   Future<String>getStoredCurrency(String key)async{
     final prefs = await SharedPreferences.getInstance();
@@ -110,16 +118,21 @@ class _CurrencyPage extends State<CurrencyPage> {
               ),
               Container(
                 margin: const EdgeInsets.only(left: 10.0),
-                child: const Icon(
-                    Icons.star_outline,
-                    color:Colors.black45
+                child: IconButton(
+                    icon: isStarred ? const Icon(Icons.star) : const Icon(Icons.star_outline),
+                    color:Colors.black45,
+                    onPressed: (){
+                      setState(() {
+                        isStarred = !isStarred;
+                      });
+                    },
                 ),
               ),
 
             ],
           ),
           FutureBuilder(
-            future: httpService.getCurrency(selectedFromCurrency, selectedToCurrency),
+            future: httpService.getCurrencyFuture(getStoredCurrency(CURRENCY_FROM), getStoredCurrency(CURRENCY_TO)),
             builder: (BuildContext context,value) {
               if (value.hasData) {
                 String currency = value.data.toString();
@@ -138,87 +151,12 @@ class _CurrencyPage extends State<CurrencyPage> {
             height: 20.0,
           ),
           Expanded(
-            child:ListView(
-              children: <Widget>[
-
-                Card(
-                    child:ListTile(
-                      title:Row(
-                        children: [
-                          const Text("1 EUR"),
-                          const Icon(
-                            Icons.arrow_right_alt,
-                            color: Colors.black,
-                            size: 30.0,
-                          ),
-                          FutureBuilder(
-                            future: httpService.getCurrency("EUR", "HUF"),
-                            builder: (BuildContext context,value) {
-                              if (value.hasData) {
-                                String currency = value.data.toString();
-                                return
-
-                                  Text(currency,style: TextStyle(fontWeight: FontWeight.bold));
-                              } else {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              }
-                            },
-                          ),
-
-                          const Text(" HUF"),
-
-                          const Expanded(
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Icon(Icons.arrow_forward_ios, color: Colors.blueGrey,),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                ),
-
-                Card(
-                    child:ListTile(
-                      title:Row(
-                        children: [
-                          const Text("1 EUR"),
-                          const Icon(
-                            Icons.arrow_right_alt,
-                            color: Colors.black,
-                            size: 30.0,
-                          ),
-                          FutureBuilder(
-                            future: httpService.getCurrency("EUR", "HUF"),
-                            builder: (BuildContext context,value) {
-                              if (value.hasData) {
-                                String currency = value.data.toString();
-                                return
-
-                                  Text(currency,style: TextStyle(fontWeight: FontWeight.bold));
-                              } else {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              }
-                            },
-                          ),
-
-                          const Text(" HUF"),
-
-                          const Expanded(
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Icon(Icons.arrow_forward_ios, color: Colors.blueGrey,),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                ),
-
-
-              ],
+            child:ListView.builder(
+              itemCount: favorites.length,
+              itemBuilder:(context, index){
+                Favorite f= favorites[index];
+                return CurrancyCard(fromCurrancy: f.fromCurrency, toCurrancy: f.toCurrency,);
+              }
             ),
           ),
           /*
