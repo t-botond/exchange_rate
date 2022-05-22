@@ -26,6 +26,7 @@ class _CurrencyPage extends State<CurrencyPage> {
 
   List<Favorite> favorites = [Favorite("USD", "BTC"), Favorite("EUR", "HUF")];
 
+  bool isStarred=false;
 
 
   Future<String>getStoredCurrency(String key)async{
@@ -117,16 +118,21 @@ class _CurrencyPage extends State<CurrencyPage> {
               ),
               Container(
                 margin: const EdgeInsets.only(left: 10.0),
-                child: const Icon(
-                    Icons.star_outline,
-                    color:Colors.black45
+                child: IconButton(
+                    icon: isStarred ? const Icon(Icons.star) : const Icon(Icons.star_outline),
+                    color:Colors.black45,
+                    onPressed: (){
+                      setState(() {
+                        isStarred = !isStarred;
+                      });
+                    },
                 ),
               ),
 
             ],
           ),
           FutureBuilder(
-            future: httpService.getCurrency(selectedFromCurrency, selectedToCurrency),
+            future: httpService.getCurrencyFuture(getStoredCurrency(CURRENCY_FROM), getStoredCurrency(CURRENCY_TO)),
             builder: (BuildContext context,value) {
               if (value.hasData) {
                 String currency = value.data.toString();
