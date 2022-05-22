@@ -2,4 +2,12 @@
 
 Valuták követésére, és gyors számítások elvégzésére készült.
 
-Edit configuration -> Additional run args `--no-sound-null-safety`
+##Run
+Edit configuration -> Additional run args: `--no-sound-null-safety`
+
+##Screenshots
+![](doc/CurrencyPage.png)
+
+
+![](doc/CalculatorPage.png)
+
