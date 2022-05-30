@@ -15,10 +15,13 @@ class CalculatorPage extends StatefulWidget {
 
 
 class _CalculatorPage extends State<CalculatorPage> {
-  double initialFromValue = 1.0;
+  double initialFromValue = 1;
   double initialToValue = 1.0;
   double rate=1.0;
   final HttpService httpService = HttpService();
+
+
+  TextField? tf2;
 
   TextEditingController _fromController =  TextEditingController();
   TextEditingController _toController =  TextEditingController();
@@ -28,8 +31,23 @@ class _CalculatorPage extends State<CalculatorPage> {
     loadCurrancy();
     _toController.text = "";
     _fromController.text = initialFromValue.toString();
-  }
+    tf2=TextField(
+      decoration: InputDecoration(
+        labelText: widget.toCurrancy,
+      ),
 
+      controller:_toController,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]+[,.]{0,1}[0-9]*'))],
+      onChanged: (value) {
+        double val=value.isEmpty?0.0:double.parse(value);
+        double res= val*(1.0/rate);
+        setState(() {
+          _fromController.text=res.toString();
+        });
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,21 +82,7 @@ class _CalculatorPage extends State<CalculatorPage> {
                   Icon(Icons.arrow_downward),
                 ],
               ),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: widget.toCurrancy,
-                ),
-                controller:_toController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]+[,.]{0,1}[0-9]*'))],
-                onChanged: (value) {
-                  double val=value.isEmpty?0.0:double.parse(value);
-                  double res= val*(1.0/rate);
-                  setState(() {
-                    _fromController.text=res.toString();
-                  });
-                },
-              ),
+              tf2!,
             ],
           ),
         ),
@@ -88,10 +92,23 @@ class _CalculatorPage extends State<CalculatorPage> {
 
   void loadCurrancy() async{
     String loadedRate=await httpService.getCurrency(widget.fromCurrancy, widget.toCurrancy);
+    if(double.tryParse(loadedRate)==null){
+      setState(() {
+        _toController.text="Hiba történt";
+        tf2=TextField(
+          decoration: InputDecoration(
+            labelText: widget.toCurrancy,
+          ),
+          enabled: false,
+          controller:_toController,
+        );
+      });
+    }else{
+      initialToValue= double.tryParse(loadedRate.toString())!=null?double.parse(loadedRate.toString()):0.0;
+      rate=initialToValue;
+      _toController.text = initialToValue.toString();
+    }
 
-    initialToValue= double.parse(loadedRate.toString());
-    rate=initialToValue;
-    _toController.text = initialToValue.toString();
   }
 
 }
